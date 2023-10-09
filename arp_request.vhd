@@ -73,39 +73,41 @@ variable varSHA, varTHA : mac_address;
 variable varSPA, varTPA : ipv4_address;
 variable varOutput : arp_payload := (others => x"00");
 begin
-if(rising_edge(clk) and reset = '1') then
-    varOutput(0 to 27) := (others => x"00");
-elsif(rising_edge(clk) and enable = '1') then
-    varHTYPE := x"0001"; -- Ethernet hardware
-    varPTYPE := x"0800"; -- IPv4 protocol
-    varHLEN := x"06"; -- MAC address length
-    varPLEN := x"04"; -- IP address length
-    varOPER := x"0001"; -- ARP Request
-    
-    varSHA := SHA; -- source MAC address
-    varSPA := SPA; -- source IPv4 address
-    varTHA := THA;
-    varTPA := TPA;
-    
-    varOutput(0) := varHTYPE(15 downto 8);
-    varOutput(1) := varHTYPE(7 downto 0);
-    varOutput(2) := varPTYPE(15 downto 8);
-    varOutput(3) := varPTYPE(7 downto 0);
-    varOutput(4) := varHLEN;
-    varOutput(5) := varPLEN;
-    varOutput(6) := varOPER(15 downto 8);
-    varOutput(7) := varOPER(7 downto 0);
-    
-    for i in 0 to 5 loop                    -- copy 6 address bytes
-        varOutput(SHA_OFFSET+i) := varSHA(i);  -- set SHA
-        varOutput(THA_OFFSET+i) := varTHA(i);  -- set THA
-    end loop;
-    for i in 0 to 3 loop                    -- copy 6 address bytes
-        varOutput(SPA_OFFSET+i) := varSPA(i);  -- set SPA
-        varOutput(TPA_OFFSET+i) := varTPA(i);  -- set TPA
-    end loop;
-end if;
+if(rising_edge(clk)) then
+    if(reset = '1') then
+        varOutput(0 to 27) := (others => x"00");
+    elsif(enable = '1') then
+        varHTYPE := x"0001"; -- Ethernet hardware
+        varPTYPE := x"0800"; -- IPv4 protocol
+        varHLEN := x"06"; -- MAC address length
+        varPLEN := x"04"; -- IP address length
+        varOPER := x"0001"; -- ARP Request
+        
+        varSHA := SHA; -- source MAC address
+        varSPA := SPA; -- source IPv4 address
+        varTHA := THA;
+        varTPA := TPA;
+        
+        varOutput(0) := varHTYPE(15 downto 8);
+        varOutput(1) := varHTYPE(7 downto 0);
+        varOutput(2) := varPTYPE(15 downto 8);
+        varOutput(3) := varPTYPE(7 downto 0);
+        varOutput(4) := varHLEN;
+        varOutput(5) := varPLEN;
+        varOutput(6) := varOPER(15 downto 8);
+        varOutput(7) := varOPER(7 downto 0);
+        
+        for i in 0 to 5 loop                    -- copy 6 address bytes
+            varOutput(SHA_OFFSET+i) := varSHA(i);  -- set SHA
+            varOutput(THA_OFFSET+i) := varTHA(i);  -- set THA
+        end loop;
+        for i in 0 to 3 loop                    -- copy 6 address bytes
+            varOutput(SPA_OFFSET+i) := varSPA(i);  -- set SPA
+            varOutput(TPA_OFFSET+i) := varTPA(i);  -- set TPA
+        end loop;
+    end if;
 output <= varOutput;
+end if;
 end process;
 
 end Behavioral;
